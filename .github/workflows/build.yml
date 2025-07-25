@@ -31,7 +31,7 @@ jobs:
           cp ./aka_cs/build/*.jar ./build_artifacts/
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aka_cs-plugin-artifacts
           path: ./build_artifacts/
