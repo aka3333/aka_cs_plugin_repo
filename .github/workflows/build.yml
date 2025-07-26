@@ -1,4 +1,4 @@
-name: Manual AKA CS Plugin Build
+name: Manual Build
 
 on:
   workflow_dispatch:
@@ -6,16 +6,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Kodu çek
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: JDK 17 kurulumu
-        uses: actions/setup-java@v1
+      - name: Setup JDK
+        uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: 17
 
-      - name: Gradle ile build işlemleri
+      - name: Grant execute permission
+        run: chmod +x gradlew || true
+
+      - name: Build Plugin
         run: |
-          gradle make makePluginsJson ensureJarCompatibility
+          gradle :aka_cs:clean :aka_cs:build
