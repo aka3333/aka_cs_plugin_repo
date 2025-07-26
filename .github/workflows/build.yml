@@ -7,29 +7,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. GRADLE WRAPPER KURULUMU
-      - name: Setup Gradle
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
-          gradle wrapper --gradle-version 8.6 --distribution-type bin
-          chmod +x gradlew
-
-      # 2. ANDROID ORTAMI
+      # 1. JAVA VE ANDROID ORTAMI
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
       - uses: android-actions/setup-android@v3
         with:
           build-tools-version: "34.0.0"
           platform-version: "34"
           ndk-version: "25b"
 
-      # 3. JAVA KURULUMU
-      - uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      # 2. GRADLE WRAPPER KURULUMU
+      - name: Setup Gradle
+        run: |
+          # Wrapper oluştur
+          gradle wrapper --gradle-version 8.6 --distribution-type bin
+          chmod +x gradlew
 
-      # 4. BUILD.GRADLE.KTS GÜNCELLEMESİ
-      - name: Configure build.gradle.kts
+      # 3. BUILD KONFİGÜRASYONU
+      - name: Configure build
         run: |
           mkdir -p aka_cs
           cat > aka_cs/build.gradle.kts << 'EOL'
@@ -44,6 +42,7 @@ jobs:
               
               defaultConfig {
                   minSdk = 21
+                  targetSdk = 34
               }
               
               compileOptions {
@@ -61,8 +60,17 @@ jobs:
           }
           EOL
 
-      # 5. BUILD ÇALIŞTIR
+          # AndroidManifest.xml oluştur
+          mkdir -p aka_cs/src/main
+          cat > aka_cs/src/main/AndroidManifest.xml << 'EOL'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+              package="com.example.aka_cs">
+          </manifest>
+          EOL
+
+      # 4. BUILD ÇALIŞTIR
       - name: Run Build
         run: |
           ./gradlew :aka_cs:clean
-          ./gradlew :aka_cs:build --stacktrace
+          ./gradlew :aka_cs:build --stacktrace --no-daemon
