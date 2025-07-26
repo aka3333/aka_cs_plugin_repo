@@ -1,14 +1,37 @@
 plugins {
-    id("com.lagradost.cloudstream3.gradle") version "1.0.0"
+    id("com.android.library") // Android kütüphanesi için
+    id("org.jetbrains.kotlin.android") // Kotlin desteği
+    id("com.lagradost.cloudstream3") version "1.0.0" // CloudStream3 eklentisi
 }
 
-version = "1.0.0"
+android {
+    namespace = "com.example.aka_cs"
+    compileSdk = 34 // Android SDK versiyonu
 
-cloudstream {
-    language = "tr"
-    description = "AKA CS plugin"
+    defaultConfig {
+        minSdk = 21 // Minimum Android versiyonu
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
-tasks.register("clean", Delete::class) {
-    delete(buildDir)
+dependencies {
+    // CloudStream3 için gerekli bağımlılıklar
+    implementation("com.lagradost:cloudstream3:VERSIYON") // GitHub'dan JitPack ile
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4") // Coroutines
 }
