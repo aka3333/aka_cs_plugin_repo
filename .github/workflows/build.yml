@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. GRADLE KURULUMU
+      # 1. GRADLE WRAPPER KURULUMU
       - name: Setup Gradle
         run: |
           sudo apt-get update
@@ -28,11 +28,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 4. BUILD.GRADLE.KTS DOSYASINI OLUŞTUR
-      - name: Create build.gradle.kts
+      # 4. BUILD.GRADLE.KTS GÜNCELLEMESİ
+      - name: Configure build.gradle.kts
         run: |
           mkdir -p aka_cs
-          cat <<EOF>aka_cs/build.gradle.kts
+          cat > aka_cs/build.gradle.kts << 'EOL'
           plugins {
               id("com.android.library") version "8.3.2"
               id("org.jetbrains.kotlin.android") version "1.9.22"
@@ -41,11 +41,25 @@ jobs:
           android {
               namespace = "com.example.aka_cs"
               compileSdk = 34
+              
               defaultConfig {
                   minSdk = 21
               }
+              
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+              
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
           }
-          EOF
+          
+          kotlin {
+              jvmToolchain(17)
+          }
+          EOL
 
       # 5. BUILD ÇALIŞTIR
       - name: Run Build
