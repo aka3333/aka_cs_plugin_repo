@@ -1,15 +1,16 @@
 plugins {
-    id("com.android.library") // Android kütüphanesi için
-    id("org.jetbrains.kotlin.android") // Kotlin desteği
-    id("com.lagradost.cloudstream3") version "1.0.0" // CloudStream3 eklentisi
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    id("com.lagradost.cloudstream3") version "4.3.4"  // 2024 güncel sürüm
 }
 
 android {
     namespace = "com.example.aka_cs"
-    compileSdk = 34 // Android SDK versiyonu
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 21 // Minimum Android versiyonu
+        minSdk = 21
+        targetSdk = 34
     }
 
     buildTypes {
@@ -21,6 +22,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -31,7 +33,10 @@ android {
 }
 
 dependencies {
-    // CloudStream3 için gerekli bağımlılıklar
-    implementation("com.lagradost:cloudstream3:VERSIYON") // GitHub'dan JitPack ile
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4") // Coroutines
+    // CloudStream3 çekirdek kütüphanesi (JitPack'ten)
+    implementation("com.github.Lagradost:CloudStream-3:4.3.4")
+
+    // Gerekli diğer bağımlılıklar
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 }
