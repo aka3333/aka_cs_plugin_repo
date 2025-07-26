@@ -7,47 +7,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. ANDROİD ORTAMINI KUR
+      # 1. Android ortamı
       - uses: android-actions/setup-android@v3
         with:
           build-tools-version: "34.0.0"
           platform-version: "34"
           ndk-version: "25b"
 
-      # 2. GRADLE WRAPPER OLUŞTUR (Android plugin'i için)
-      - name: Setup Gradle
-        run: |
-          # Android plugin'ini eklemek için özel ayar
-          cat <<EOF > gradle.properties
-          android.useAndroidX=true
-          android.enableJetifier=true
-          EOF
-          
-          # Build script hazırla
-          cat <<EOF > build.gradle.kts
-          plugins {
-              id("com.android.library") version "8.3.2"
-              kotlin("android") version "1.9.22"
-          }
-          
-          android {
-              compileSdk = 34
-              defaultConfig {
-                  minSdk = 21
-              }
-          }
-          EOF
-
-          # Wrapper oluştur
-          gradle wrapper --gradle-version 8.6 --distribution-type bin
-          chmod +x gradlew
-
-      # 3. JAVA KURULUMU
+      # 2. Java kurulumu
       - uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 4. BUILD ÇALIŞTIR
+      # 3. Build işlemi
       - name: Run Build
-        run: ./gradlew :aka_cs:build --stacktrace
+        run: |
+          # Namespace kontrolü
+          if ! grep -q "namespace" aka_cs/build.gradle.kts; then
+            sed -i '/android {/a \    namespace = "com.example.aka_cs"' aka_cs/build.gradle.kts
+          fi
+          
+          ./gradlew :aka_cs:build --stacktrace
