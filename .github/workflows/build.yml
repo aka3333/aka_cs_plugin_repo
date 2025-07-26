@@ -7,14 +7,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. GRADLE WRAPPER KURULUMU
-      - name: Setup Gradle Wrapper
+      # 1. GRADLE KURULUMU
+      - name: Setup Gradle
         run: |
           sudo apt-get update
           sudo apt-get install -y gradle
           gradle wrapper --gradle-version 8.6 --distribution-type bin
           chmod +x gradlew
-          ./gradlew --version
 
       # 2. ANDROID ORTAMI
       - uses: android-actions/setup-android@v3
@@ -29,34 +28,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 4. BUILD.GRADLE.KTS DOSYASI OLUŞTURMA
-      - name: Create build.gradle.kts if missing
+      # 4. BUILD.GRADLE.KTS DOSYASINI OLUŞTUR
+      - name: Create build.gradle.kts
         run: |
           mkdir -p aka_cs
-          if [ ! -f "aka_cs/build.gradle.kts" ]; then
-            cat > aka_cs/build.gradle.kts << 'EOL'
-            plugins {
-                id("com.android.library") version "8.3.2"
-                id("org.jetbrains.kotlin.android") version "1.9.22"
-            }
-            
-            android {
-                namespace = "com.example.aka_cs"
-                compileSdk = 34
-                defaultConfig {
-                    minSdk = 21
-                }
-            }
-            EOL
-          fi
+          cat <<EOF>aka_cs/build.gradle.kts
+          plugins {
+              id("com.android.library") version "8.3.2"
+              id("org.jetbrains.kotlin.android") version "1.9.22"
+          }
+          
+          android {
+              namespace = "com.example.aka_cs"
+              compileSdk = 34
+              defaultConfig {
+                  minSdk = 21
+              }
+          }
+          EOF
 
-      # 5. NAMESPACE KONTROLÜ
-      - name: Ensure namespace exists
-        run: |
-          if ! grep -q "namespace" aka_cs/build.gradle.kts; then
-            sed -i '/android {/a \    namespace = "com.example.aka_cs"' aka_cs/build.gradle.kts
-          fi
-
-      # 6. BUILD İŞLEMİ
+      # 5. BUILD ÇALIŞTIR
       - name: Run Build
-        run: ./gradlew :aka_cs:build --stacktrace
+        run: |
+          ./gradlew :aka_cs:clean
+          ./gradlew :aka_cs:build --stacktrace
