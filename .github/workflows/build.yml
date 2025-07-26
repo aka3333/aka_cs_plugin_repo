@@ -1,4 +1,4 @@
-name: Auto Gradle Build
+name: Android Build
 on: [push, workflow_dispatch]
 
 jobs:
@@ -7,51 +7,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. GRADLE WRAPPER SİHİRBAZI
-      - name: Magic Gradle Setup
-        run: |
-          # Gerekli araçları kur
-          sudo apt-get update
-          sudo apt-get install -y unzip
-          
-          # Gradle indir ve kur (wrapper oluşturmak için)
-          wget https://services.gradle.org/distributions/gradle-8.6-bin.zip
-          sudo unzip -d /opt/gradle gradle-8.6-bin.zip
-          export PATH=$PATH:/opt/gradle/gradle-8.6/bin
-          
-          # Proje dizininde wrapper oluştur
-          gradle wrapper --gradle-version 8.6 --distribution-type bin
-          
-          # İzinleri ayarla
-          chmod +x gradlew
-          ./gradlew --version
+      # 1. ANDROİD ORTAMINI KUR
+      - uses: android-actions/setup-android@v3
+        with:
+          build-tools-version: "34.0.0"
+          platform-version: "34"
+          ndk-version: "25b"
 
-      # 2. JAVA & ANDROID ORTAMI
+      # 2. GRADLE WRAPPER OLUŞTUR (Android plugin'i için)
+      - name: Setup Gradle
+        run: |
+          # Android plugin'ini eklemek için özel ayar
+          cat <<EOF > gradle.properties
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
+          
+          # Build script hazırla
+          cat <<EOF > build.gradle.kts
+          plugins {
+              id("com.android.library") version "8.3.2"
+              kotlin("android") version "1.9.22"
+          }
+          
+          android {
+              compileSdk = 34
+              defaultConfig {
+                  minSdk = 21
+              }
+          }
+          EOF
+
+          # Wrapper oluştur
+          gradle wrapper --gradle-version 8.6 --distribution-type bin
+          chmod +x gradlew
+
+      # 3. JAVA KURULUMU
       - uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - uses: android-actions/setup-android@v3
-        with:
-          build-tools-version: "34.0.0"
-          platform-version: "34"
-
-      # 3. BUILD İŞLEMİ
+      # 4. BUILD ÇALIŞTIR
       - name: Run Build
-        run: |
-          # Build öncesi cache kontrolü
-          if [ -f "gradle.properties" ]; then
-            echo "org.gradle.caching=true" >> gradle.properties
-          fi
-          
-          ./gradlew :aka_cs:clean :aka_cs:build --no-daemon --stacktrace
-
-      # 4. ÇIKTILARI KAYDET (Opsiyonel)
-      - uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: build-artifacts
-          path: |
-            aka_cs/build/outputs/
-            aka_cs/build/libs/
+        run: ./gradlew :aka_cs:build --stacktrace
