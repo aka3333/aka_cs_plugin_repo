@@ -22,18 +22,25 @@ jobs:
       # 2. GRADLE WRAPPER KURULUMU
       - name: Setup Gradle
         run: |
-          # Wrapper oluştur
           gradle wrapper --gradle-version 8.6 --distribution-type bin
           chmod +x gradlew
 
-      # 3. BUILD KONFİGÜRASYONU
-      - name: Configure build
+      # 3. PROJE YAPILANDIRMASI
+      - name: Configure project
         run: |
-          mkdir -p aka_cs
+          mkdir -p aka_cs/src/main/kotlin
+          
+          # build.gradle.kts
           cat > aka_cs/build.gradle.kts << 'EOL'
           plugins {
               id("com.android.library") version "8.3.2"
               id("org.jetbrains.kotlin.android") version "1.9.22"
+          }
+          
+          repositories {
+              google()
+              mavenCentral()
+              maven("https://jitpack.io")
           }
           
           android {
@@ -42,7 +49,6 @@ jobs:
               
               defaultConfig {
                   minSdk = 21
-                  targetSdk = 34
               }
               
               compileOptions {
@@ -55,21 +61,22 @@ jobs:
               }
           }
           
-          kotlin {
-              jvmToolchain(17)
+          dependencies {
+              implementation("com.github.Lagradost:CloudStream-3:4.3.4")
           }
           EOL
-
-          # AndroidManifest.xml oluştur
-          mkdir -p aka_cs/src/main
+          
+          # AndroidManifest.xml
           cat > aka_cs/src/main/AndroidManifest.xml << 'EOL'
           <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-              package="com.example.aka_cs">
-          </manifest>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" />
           EOL
 
-      # 4. BUILD ÇALIŞTIR
+      # 4. BAĞIMLILIKLARI İNDİR
+      - name: Download dependencies
+        run: ./gradlew :aka_cs:dependencies
+
+      # 5. BUILD ÇALIŞTIR
       - name: Run Build
         run: |
           ./gradlew :aka_cs:clean
