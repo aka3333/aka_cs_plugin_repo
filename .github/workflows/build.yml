@@ -1,13 +1,35 @@
-name: Build
-on: [push]
+name: Build CloudStream Plugin
+on: 
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Manuel tetikleme ekledik
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    - uses: android-actions/setup-android@v3
-    - run: ./gradlew :aka_cs:build
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew :aka_cs:clean :aka_cs:build --stacktrace
+
+      - name: Upload artifacts (optional)
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-output
+          path: |
+            aka_cs/build/outputs/
+            aka_cs/build/libs/
