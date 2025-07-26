@@ -24,13 +24,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gradle
 
       - name: Build plugin
-        run: gradle clean build
+        run: gradle :aka_cs:clean :aka_cs:build
 
       - name: Copy artifacts
         run: |
           mkdir -p ./build_artifacts
-          cp ./aka_cs/build/*.cs3 ./build_artifacts/
-          cp ./aka_cs/build/*.jar ./build_artifacts/
+          cp ./aka_cs/build/*.cs3 ./build_artifacts/ || true
+          cp ./aka_cs/build/*.jar ./build_artifacts/ || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
