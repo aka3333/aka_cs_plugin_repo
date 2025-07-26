@@ -1,17 +1,19 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal() // Standart Gradle eklentileri
-        maven("https://jitpack.io") // JitPack (CloudStream3 burada olabilir)
-        mavenCentral() // Maven deposu
+        gradlePluginPortal()
+        maven("https://jitpack.io")  // CloudStream eklentisi burada
+        google()  // Android eklentileri için
     }
 }
 
 dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
+        google()
         mavenCentral()
-        maven("https://jitpack.io") // JitPack'ten bağımlılıklar
+        maven("https://jitpack.io")  // CloudStream kütüphanesi
     }
 }
 
-rootProject.name = "aka_cs" // Proje adınızı yazın
-include(":aka_cs") // Modül adı
+rootProject.name = "aka_cs"  // Projenizin adı
+include(":aka_cs")  // Modül adı
