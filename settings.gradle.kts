@@ -1,19 +1,20 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven("https://jitpack.io")  // CloudStream eklentisi burada
-        google()  // Android eklentileri için
+        google() // Android plugin'leri için Google deposu EKLENDİ
+        mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        google()
+        google() // Android bağımlılıkları için EKLENDİ
         mavenCentral()
-        maven("https://jitpack.io")  // CloudStream kütüphanesi
+        maven("https://jitpack.io")
     }
 }
 
-rootProject.name = "aka_cs"  // Projenizin adı
-include(":aka_cs")  // Modül adı
+rootProject.name = "aka_cs"
+include(":aka_cs")
