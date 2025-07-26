@@ -1,17 +1,17 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-        maven { url = uri("https://jitpack.io") }
-        maven { url = uri("https://repo.maven.apache.org/maven2") }
+        gradlePluginPortal() // Standart Gradle eklentileri
+        maven("https://jitpack.io") // JitPack (CloudStream3 burada olabilir)
+        mavenCentral() // Maven deposu
     }
 }
 
 dependencyResolutionManagement {
     repositories {
-        maven { url = uri("https://jitpack.io") }
         mavenCentral()
+        maven("https://jitpack.io") // JitPack'ten bağımlılıklar
     }
 }
 
-rootProject.name = "aka_cs_plugin_repo"
-include(":aka_cs")
+rootProject.name = "aka_cs" // Proje adınızı yazın
+include(":aka_cs") // Modül adı
