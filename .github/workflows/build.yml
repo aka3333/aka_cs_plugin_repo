@@ -2,7 +2,7 @@ name: Build CloudStream Plugin
 on: 
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Manuel tetikleme ekledik
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,11 +25,12 @@ jobs:
           chmod +x gradlew
           ./gradlew :aka_cs:clean :aka_cs:build --stacktrace
 
-      - name: Upload artifacts (optional)
+      - name: Upload artifacts
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # v4'e güncellendi
         with:
           name: build-output
           path: |
             aka_cs/build/outputs/
             aka_cs/build/libs/
+          retention-days: 5  # Artifact saklama süresi (opsiyonel)
