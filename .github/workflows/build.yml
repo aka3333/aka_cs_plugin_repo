@@ -7,16 +7,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. GRADLE WRAPPER OLUŞTUR
-      - name: Setup Gradle
+      # 1. GRADLE WRAPPER KURULUMU
+      - name: Setup Gradle Wrapper
         run: |
-          # Gradle kur
-          sudo apt-get update && sudo apt-get install -y gradle
-          
-          # Wrapper oluştur
+          sudo apt-get update
+          sudo apt-get install -y gradle
           gradle wrapper --gradle-version 8.6 --distribution-type bin
-          
-          # İzinleri ayarla
           chmod +x gradlew
           ./gradlew --version
 
@@ -33,13 +29,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 4. NAMESPACE KONTROLÜ VE BUILD
-      - name: Build with Namespace Fix
+      # 4. BUILD.GRADLE.KTS DOSYASI OLUŞTURMA
+      - name: Create build.gradle.kts if missing
         run: |
-          # build.gradle.kts dosyasını kontrol et
+          mkdir -p aka_cs
           if [ ! -f "aka_cs/build.gradle.kts" ]; then
-            mkdir -p aka_cs
-            cat <<EOF > aka_cs/build.gradle.kts
+            cat > aka_cs/build.gradle.kts << 'EOL'
             plugins {
                 id("com.android.library") version "8.3.2"
                 id("org.jetbrains.kotlin.android") version "1.9.22"
@@ -52,12 +47,16 @@ jobs:
                     minSdk = 21
                 }
             }
-            EOF
+            EOL
           fi
-          
-          # Namespace kontrolü
+
+      # 5. NAMESPACE KONTROLÜ
+      - name: Ensure namespace exists
+        run: |
           if ! grep -q "namespace" aka_cs/build.gradle.kts; then
             sed -i '/android {/a \    namespace = "com.example.aka_cs"' aka_cs/build.gradle.kts
           fi
-          
-          ./gradlew :aka_cs:build --stacktrace
+
+      # 6. BUILD İŞLEMİ
+      - name: Run Build
+        run: ./gradlew :aka_cs:build --stacktrace
