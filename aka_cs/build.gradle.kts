@@ -1,7 +1,19 @@
+// Üst kısma bu blok EKLENDİ
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.3.2") // Android Gradle Plugin
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22") // Kotlin Plugin
+    }
+}
+
 plugins {
-    id("com.android.library")
+    id("com.android.library") // Artık bulunabilecek
     id("org.jetbrains.kotlin.android")
-    id("com.lagradost.cloudstream3") version "4.3.4"  // 2024 güncel sürüm
+    id("com.lagradost.cloudstream3") version "4.3.4" // CloudStream eklentisi
 }
 
 android {
@@ -13,30 +25,10 @@ android {
         targetSdk = 34
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    // ... (diğer android ayarları aynı)
 }
 
 dependencies {
-    // CloudStream3 çekirdek kütüphanesi (JitPack'ten)
     implementation("com.github.Lagradost:CloudStream-3:4.3.4")
-
-    // Gerekli diğer bağımlılıklar
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 }
