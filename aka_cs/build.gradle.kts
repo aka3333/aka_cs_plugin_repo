@@ -1,5 +1,5 @@
 plugins {
-    id("cloudstream-plugin") version "0.0.1"
+    id("com.lagradost.cloudstream3.gradle") version "1.0.0"
 }
 
 version = "1.0.0"
