@@ -7,22 +7,54 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Android ortamı
+      # 1. GRADLE WRAPPER OLUŞTUR
+      - name: Setup Gradle
+        run: |
+          # Gradle kur
+          sudo apt-get update && sudo apt-get install -y gradle
+          
+          # Wrapper oluştur
+          gradle wrapper --gradle-version 8.6 --distribution-type bin
+          
+          # İzinleri ayarla
+          chmod +x gradlew
+          ./gradlew --version
+
+      # 2. ANDROID ORTAMI
       - uses: android-actions/setup-android@v3
         with:
           build-tools-version: "34.0.0"
           platform-version: "34"
           ndk-version: "25b"
 
-      # 2. Java kurulumu
+      # 3. JAVA KURULUMU
       - uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Build işlemi
-      - name: Run Build
+      # 4. NAMESPACE KONTROLÜ VE BUILD
+      - name: Build with Namespace Fix
         run: |
+          # build.gradle.kts dosyasını kontrol et
+          if [ ! -f "aka_cs/build.gradle.kts" ]; then
+            mkdir -p aka_cs
+            cat <<EOF > aka_cs/build.gradle.kts
+            plugins {
+                id("com.android.library") version "8.3.2"
+                id("org.jetbrains.kotlin.android") version "1.9.22"
+            }
+            
+            android {
+                namespace = "com.example.aka_cs"
+                compileSdk = 34
+                defaultConfig {
+                    minSdk = 21
+                }
+            }
+            EOF
+          fi
+          
           # Namespace kontrolü
           if ! grep -q "namespace" aka_cs/build.gradle.kts; then
             sed -i '/android {/a \    namespace = "com.example.aka_cs"' aka_cs/build.gradle.kts
